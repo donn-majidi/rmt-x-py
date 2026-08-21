@@ -73,8 +73,8 @@ def wishart_ensembles(ndim1: int, ndim2: int, beta: int, simul_count: int):
     rho = mp_density(x, xmin, xmax)
     
     fig, ax = plt.subplots()
-    ax.hist(evals, bins='auto', alpha=0.75, density=True, label=f'Empirical Density - $\\beta$ = {beta}')
-    ax.plot(x, rho, color='darkorange', linewidth = 2, label=f'Marcenko-Pastur Density - $C$ = {c}')
+    ax.hist(evals, bins=50, alpha=0.75, density=True, label=f'Empirical Density - $\\beta$ = {beta}')
+    ax.plot(x, rho, color='darkorange', linewidth = 2, label=f'Marcenko-Pastur Density - $C$ = {c:.2f}')
     ax.set_xlim(0,xmax+1)
     ax.legend()
     ax.set_title('Empirical vs. Asymptotic Density')
