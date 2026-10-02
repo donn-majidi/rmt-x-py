@@ -1,5 +1,5 @@
 # rmt-x-py
-Study of common random matrix ensembles in Python.
+RMT Tooolbox in Python
 
 ## Table of Contents
 - [Overview](#overview)
@@ -9,6 +9,7 @@ Study of common random matrix ensembles in Python.
 - [License](#license)
 
 ## Overview
+This repository contains a collection of Python modules for the study and simulation analysis of common random matrix ensembles, including the Gaussian and Wishart-Laguerre ensembles.
 
 ## Modules
 
