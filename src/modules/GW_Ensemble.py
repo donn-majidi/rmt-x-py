@@ -31,16 +31,19 @@ class GW_Ensemble:
     
     def __init__(self, endog: np.ndarray | None = None, beta: int | None = None):
         
-        self._endog = array_like(endog, 'endog', ndim=2, optional=True)
+        self._endog = endog
         self._beta = int_like(beta, 'beta', optional=True)
         self._ndim = None
-        self._evals = None
+        self.evals = None
         
         self._beta_sim = None
-        self._evals_sim = None
+        self.evals_sim = None
+        
+        if self._endog is not None and not isinstance(self._endog, np.ndarray):
+            raise ValueError('endog matrix has to be a 2D numpy array.')
         
         if self._endog is not None:
-            if np.all(self._endog != self._endog.conj().T):
+            if np.any(self._endog != self._endog.conj().T):
                 raise ValueError('Input matrix is not self-dual, therefore it '
                                  'cannot belong to the Gauss-Wigner ensemble.')
             self._ndim = self._endog.shape[0]
@@ -53,13 +56,33 @@ class GW_Ensemble:
         
         
     def __str__(self):
-        pass
+        string = 'Class handle for Gauss-Wigner Random Matrix Ensembles.\n'
+        if self._beta is not None:
+            if self._beta == 1:
+                string += 'Class is initiated for the GOE.\n'
+            elif self._beta == 2:
+                string += 'Class is initiated for the GUE.\n'
+            else:
+                string += 'Class is initiated for the GSE.\n'
+                
+            string += '(ndim = ' + str(self._ndim) + ' -- '
+            string += 'beta = ' + str(self._beta) + ')'
+                
+        return string
     
     def __repr__(self):
-        pass
+        string = self.__str__()
+        string = string[:-1]
+        string += ', id: ' + hex(id(self)) + ')'
+        return string
     
     def simulate(self, ndim: int, beta: int, nsim: int | None = 1000,
                  seed: int | None = 1776):
+        
+        '''
+        This function simulates random matrix ensembles from the Gaussian Orthogonal,
+        Unitary, and Symplectic ensembles and calculates their eigenvalues.
+        '''
         
         ndim = int_like(ndim, 'ndim')
         beta = int_like(beta, 'beta')
@@ -80,11 +103,11 @@ class GW_Ensemble:
             
         if endog_ndim is not None and endog_ndim != ndim:
             warnings.warn('ndim is different from the dimension of the endog matrix.',
-                          category=Warning, stacklevel=1)
+                          category=Warning, stacklevel=2)
             
         if endog_beta is not None and endog_beta != beta:
             warnings.warn('beta is different from the Dyson index of the endog matrix.',
-                          category=Warning, stacklevel=1)
+                          category=Warning, stacklevel=2)
             
         evals = np.array([])
         rng = np.random.default_rng(seed=seed)
@@ -143,15 +166,22 @@ class GW_Ensemble:
         ## Rescale eigenvalues x -> sqrt(N * beta)x
         evals /= np.sqrt(beta * ndim)
         ## Sort eigenvalues from largest to smallest
-        evals = evals[::-1]
+        indx = np.argsort(evals)
+        indx = indx[::-1]
+        evals = evals[indx]
         
-        self._evals_sim = evals
+        self.evals_sim = evals
         self._beta_sim = beta
         
     def plot_spectrum(self, ax: plt.Axes | None = None, **kwargs):
         
-        evals = self._evals
-        evals_sim = self._evals_sim
+        '''
+        This function plots the empirical spectral density of the ensembles.
+        It optionally accepts a plt.Axes object as input to use as the canvas.
+        '''
+        
+        evals = self.evals
+        evals_sim = self.evals_sim
         beta = self._beta
         beta_sim = self._beta_sim
         
@@ -173,8 +203,8 @@ class GW_Ensemble:
         ## manually set to zero
         rho[0], rho[-1] = 0, 0
         
-        sns.lineplot(x=x_grid, y=rho, ax=canvas, color = 'orangered',
-                     label='Wigner Semicircle Law')
+        sns.lineplot(x=x_grid, y=rho, ax=canvas, color = 'coral',
+                     label="Wigner's Semicircle Law")
         canvas.set_ylabel('Density')
         canvas.set_xlabel('$x$')
         canvas.set_title('Average Spectral Density')
@@ -189,7 +219,7 @@ class GW_Ensemble:
             e_grid = (e_edges[1:] + e_edges[:-1])/2
             
             ## plot the empirical density of the eigenvalues
-            sns.scatterplot(x=e_grid, y=e_density, ax=canvas, marker = 'X', color='darkslategrey',
+            sns.scatterplot(x=e_grid, y=e_density, ax=canvas, marker = 'X', color='darkmagenta',
                             label=f'Empirical Spectral Density of the endog Matrix - $\\beta_0 = {beta}$')
             
         if evals_sim is not None:
@@ -205,8 +235,14 @@ class GW_Ensemble:
     
     def plot_scree(self, ax: plt.Axes | None = None, **kwargs):
         
-        evals = self._evals
-        evals_sim = self._evals_sim
+        '''
+        This function graphs the scree plots of the sorted eigenvalues of th endogenous 
+        and the simulated matrices. If the endogenous matrix is not set, it only graphs
+        the scree plot of the eigenvalues of the simulated matrix.
+        '''
+        
+        evals = self.evals
+        evals_sim = self.evals_sim
         beta = self._beta
         beta_sim = self._beta_sim
         
@@ -222,10 +258,12 @@ class GW_Ensemble:
             
         if evals is not None:
             sns.scatterplot(evals, ax=canvas, marker = 'X', color='darkslategrey',
+                            alpha = 0.5, linewidth  = 0.8,
                             label=f'Eigenvalues of the Endogenous Matrix - $\\beta_0 = {beta}$')
             
         if evals_sim is not None:
-            sns.scatterplot(evals_sim, ax=canvas, label='Simulated Eigenvalues - $\\beta_s = {beta_sim}$')
+            sns.scatterplot(evals_sim, ax=canvas, alpha = 0.5, linewidth = 0.8,
+                            label=f'Simulated Eigenvalues - $\\beta_s = {beta_sim}$')
             
         canvas.set_ylabel('Sorted Eigenvalues')
         canvas.set_xlabel('$x$')
@@ -242,9 +280,22 @@ class GW_Ensemble:
         _evals = np.linalg.eigvalsh(endog)
         ## Scale the eigenvalues by sqrt(N * beta)
         _evals /= np.sqrt(ndim * beta)
+        
+        ## For quaternionic self-dual matrices perform the following routine
+        ## to keep only the unique eigenvalues
+        if beta == 4:
+            mask = []
+            mask.append(True)
+            for j in range(1, len(_evals)):
+                if np.round(_evals[j], 5) == np.round(_evals[j-1], 5):
+                    mask.append(False)
+                else:
+                    mask.append(True)
+            _evals = _evals[mask]   # These are now the unique eigenvalues.
+        
+        ## Sort eigenvalues from largest to smallest
         _evals = _evals[::-1]
-        self._evals = _evals
+        self.evals = _evals
         
             
-            
-                    
+        
