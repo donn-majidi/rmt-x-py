@@ -9,7 +9,7 @@ RMT Tooolbox in Python
 - [License](#license)
 
 ## Overview
-This repository contains a collection of Python modules for the study and simulation analysis of common random matrix ensembles, including the Gauss-Wigner and Wishart-Laguerre ensembles.
+This repository contains a collection of Python modules for the study and simulation analysis of common random matrix ensembles, including Gauss-Wigner and Wishart-Laguerre ensembles.
 
 ## Modules
 
