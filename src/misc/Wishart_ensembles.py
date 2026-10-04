@@ -21,8 +21,8 @@ rho = mp_density(x,xmin,xmax)
 
 def wishart_ensembles(ndim1: int, ndim2: int, beta: int, simul_count: int):
     
-    if ndim1 >= ndim2:
-        raise ValueError('First dimension must be strictly smaller than the second dimension.')
+    #if ndim1 >= ndim2:
+    #    raise ValueError('First dimension must be strictly smaller than the second dimension.')
 
     evals = np.array([])
 
@@ -71,6 +71,7 @@ def wishart_ensembles(ndim1: int, ndim2: int, beta: int, simul_count: int):
     xmax = ( 1 + 1/np.sqrt(c) )**2
     x = np.linspace(xmin,xmax,500)
     rho = mp_density(x, xmin, xmax)
+#    rho[0] = max(1-1/c,0)
     
     fig, ax = plt.subplots()
     ax.hist(evals, bins=50, alpha=0.75, density=True, label=f'Empirical Density - $\\beta$ = {beta}')
@@ -79,3 +80,5 @@ def wishart_ensembles(ndim1: int, ndim2: int, beta: int, simul_count: int):
     ax.legend()
     ax.set_title('Empirical vs. Asymptotic Density')
     plt.show()
+    
+    return evals
