@@ -161,6 +161,7 @@ Returns:
 
 ## Requirements
 - [`numpy>=2.3.0`](https://numpy.org/)
+- [`pandas>=2.3.0`](https://pandas.pydata.org/)
 - [`matplotlib>=3.10.0`](https://matplotlib.org/)
 - [`seaborn>=0.13.0`](https://seaborn.pydata.org/)
 - [`scikit-learn>=1.8.0`](https://scikit-learn.org/)
