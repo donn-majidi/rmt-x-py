@@ -167,6 +167,7 @@ Returns:
 - [`scikit-learn>=1.8.0`](https://scikit-learn.org/)
 - [`statsmodels>=0.14.0`](https://www.statsmodels.org/)
 ## References
+- Ledoit, O., & Wolf, M., (2004), A Well-Conditioned Estimator for Large-Dimensional Covariance Matrices. *Journal of Multivariate Analysis*, 88, 365–411.
 - Livan, G., Novaes, M., & Vivo, P. (2018). Introduction to Random Matrices: Theory and Practice. *SpringerBriefs in Mathematical Physics* (Vol. 26). Springer, Cham. 10.1007/978-3-319-70885-0
 ## License
 This project is licensed under the GNU General Public License v3.0. See the [LICENSE](LICENSE) file for details.
