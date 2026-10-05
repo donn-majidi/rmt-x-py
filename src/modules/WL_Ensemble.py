@@ -327,13 +327,13 @@ class WL_Ensemble:
                 if plot_type == 'density':
                     sns.scatterplot(x=e_grid, y=e_density, ax=canvas_lw, marker='X', color='mediumblue',
                                     label=f'Ledoit-Wolf Estimator - Shrinkage: {shrinkage:.2f}')
-                    if np.std(evals) > 0:
+                    if np.std(evals) > 1e-2:
                         sns.rugplot(evals, ax=canvas_lw, color='darkslategrey',
                                     label='Population Covariance Matrix')
                 else:
                     sns.histplot(evals_lw, bins=nbins, ax=canvas_lw, stat='density',
                                  label=f'Ledoit-Wolf Estimator - Shrinkage: {shrinkage:.2f}')
-                    if np.std(evals) > 0:
+                    if np.std(evals) > 1e-2:
                         sns.rugplot(evals, ax=canvas_lw, color='darkslategrey',
                                     label='Population Covariance Matrix')
         
