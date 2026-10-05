@@ -46,7 +46,15 @@ class GW_Ensemble:
             if np.any(self._endog != self._endog.conj().T):
                 raise ValueError('Input matrix is not self-dual, therefore it '
                                  'cannot belong to the Gauss-Wigner ensemble.')
-            self._ndim = self._endog.shape[0]
+            if self._beta is None:
+                raise ValueError('If endog is passed, beta must be passed too.')
+                
+            ## !NOTE: Quaternionic self-dual matrices are 2N by 2N matrices by
+            ##        consturction, whereas the dimension of the system is N.
+            if self._beta == 4:
+                self._ndim = self._endog.shape[0]/2
+            else:
+                self._ndim = self._endog.shape[0]
             self._compute_eig()
             
         if self._beta is not None:
@@ -278,9 +286,6 @@ class GW_Ensemble:
         beta = self._beta
         
         _evals = np.linalg.eigvalsh(endog)
-        ## Scale the eigenvalues by sqrt(N * beta)
-        _evals /= np.sqrt(ndim * beta)
-        
         ## For quaternionic self-dual matrices perform the following routine
         ## to keep only the unique eigenvalues
         if beta == 4:
@@ -292,6 +297,9 @@ class GW_Ensemble:
                 else:
                     mask.append(True)
             _evals = _evals[mask]   # These are now the unique eigenvalues.
+        
+        ## Scale the eigenvalues by sqrt(N * beta)
+        _evals /= np.sqrt(ndim * beta)
         
         ## Sort eigenvalues from largest to smallest
         _evals = _evals[::-1]

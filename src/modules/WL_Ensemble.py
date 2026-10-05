@@ -41,7 +41,13 @@ class WL_Ensemble:
         
         self._endog = array_like(endog, 'endog', ndim=2)
         self._beta = int_like(beta, 'beta')
-        self._ndim = self._endog.shape[0]
+        
+        ## !NOTE: Quaternionic self-dual matrices are 2N by 2N matrices by
+        ##        consturction, whereas the dimension of the system is N.
+        if self._beta == 4:
+            self._ndim = self._endog.shape[0]/2
+        else:
+            self._ndim = self._endog.shape[0]
         self._nsim = None
         
         if np.any(self._endog != self._endog.conj().T):
@@ -195,12 +201,11 @@ class WL_Ensemble:
     def _compute_eig(self):
         
         endog = self._endog
-        ## beta = self._beta
-        ## ndim = self._ndim
+        beta = self._beta
+        ndim = self._ndim
         
         _evals = np.linalg.eigvalsh(endog)
         
-        '''
         ## For quaternionic self-dual matrices perform the following routine
         ## to keep only the unique eigenvalues
         if beta == 4:
@@ -215,7 +220,6 @@ class WL_Ensemble:
         
         ## Rescale eigenvluaes x -> (beta)x
         _evals /= (beta)
-        '''
         
         ## Sort eigenvalues from largest to smallest
         _evals = _evals[::-1]
